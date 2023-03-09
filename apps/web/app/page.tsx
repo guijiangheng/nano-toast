@@ -1,10 +1,13 @@
-import { Button } from "nano-toast";
+'use client';
+
+import { loremIpsum } from 'lorem-ipsum';
+import { toast, Toaster } from 'nano-toast';
 
 export default function Web() {
   return (
     <div>
-      <h1>Web</h1>
-      <Button />
+      <button onClick={() => toast(loremIpsum())}>toast</button>
+      <Toaster />
     </div>
   );
 }
