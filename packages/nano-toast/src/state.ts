@@ -41,6 +41,12 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
 
     useEffect(() => subject.subscribe((x) => setToasts((v) => [x, ...v])), []);
 
+    useEffect(() => {
+      if (!toasts.length) {
+        setExpanded(false);
+      }
+    }, [toasts.length]);
+
     return {
       ...params,
       expanded,
