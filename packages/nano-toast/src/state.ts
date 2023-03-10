@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useMemo } from 'react';
 
 import { createContext } from './hooks';
 import { Subject } from './subject';
@@ -17,6 +17,7 @@ const subject = new Subject<ToastData>();
 interface HeightT {
   id: number;
   height: number;
+  removed: boolean;
 }
 
 interface Params {
@@ -29,6 +30,11 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
     const [expanded, setExpanded] = useState(false);
     const [toasts, setToasts] = useState([] as ToastData[]);
     const [heights, setHeights] = useState([] as HeightT[]);
+
+    const frontToastHeight = useMemo(
+      () => heights.find((x) => !x.removed)?.height ?? 0,
+      [heights],
+    );
 
     const removeToast = (toast: ToastData) =>
       setToasts((v) => v.filter((x) => x.id !== toast.id));
@@ -43,6 +49,7 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
       removeToast,
       heights,
       setHeights,
+      frontToastHeight,
     };
   },
 );

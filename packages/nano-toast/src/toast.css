@@ -2,9 +2,10 @@
   --y: translateY(100%);
   --border-radius: 6px;
 
-  --offset: var(--height-index) * var(--gap);
-  --expanded-offset: var(--toast-height-before) + var(--gap) *
-    var(--height-index);
+  --direction: -1;
+  --offset: var(--direction) * var(--height-index) * var(--gap);
+  --expanded-offset: var(--direction) * var(--toast-height-before) +
+    var(--offset);
 
   position: absolute;
   right: 0;
@@ -16,8 +17,6 @@
   border: 1px solid #eee;
   border-radius: var(--border-radius);
 
-  transform: var(--y);
-
   z-index: var(--z-index);
   outline: none;
   background: #fff;
@@ -26,6 +25,8 @@
 
   will-change: opacity, transform, height;
   transition: opacity 400ms, transform 400ms, height 400ms;
+
+  transform: var(--y);
 }
 
 .nano-toast-toast > * {
@@ -35,6 +36,7 @@
 .nano-toast-toast[data-mounted='true'] {
   --y: translateY(0);
   opacity: 1;
+  height: var(--initial-height); /* need this to animate height */
 }
 
 .nano-toast-toast[data-front='false']::after {
@@ -47,21 +49,58 @@
 }
 
 .nano-toast-toast[data-front='false'][data-expanded='false'] {
-  --y: translateY(calc(-1 * var(--offset)))
+  --y: translateY(calc(var(--offset)))
     scale(calc(1 - var(--height-index) * 0.05));
   height: var(--front-toast-height);
 }
 
 .nano-toast-toast[data-front='false'][data-expanded='true'] {
-  --y: translateY(calc(-1 * (var(--expanded-offset))));
+  --y: translateY(calc(var(--expanded-offset)));
   height: var(--initial-height);
+}
+
+.nano-toast-toast[data-removed='true'][data-expanded='true'] {
+  --y: translateY(calc(var(--expanded-offset) + var(--direction) * -100%));
+  opacity: 0;
+}
+
+.nano-toast-toast[data-removed='true'][data-expanded='false'] {
+  opacity: 0;
 }
 
 .nano-toast-toast[data-front='false'][data-expanded='false'] > * {
   opacity: 0;
+  pointer-events: none;
 }
 
 .nano-toast-toast[data-visible='false'] {
   opacity: 0;
   pointer-events: none;
+}
+
+.nano-toast-close-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  height: 20px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  transform: translate(-35%, -35%);
+
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 50%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+  transition: opacity 100ms;
+}
+
+.nano-toast-toast:hover .nano-toast-close-btn {
+  opacity: 1;
 }

@@ -6,6 +6,7 @@ import { useMounted } from './hooks';
 import { ToastData, useToaster } from './state';
 
 const VISIBLE_TOAST_COUNT = 3;
+const TIMEOUT_BEFORE_REMOVE = 400;
 
 interface ToastProps {
   index: number;
@@ -13,34 +14,48 @@ interface ToastProps {
 }
 
 export const Toast = ({ index, data }: ToastProps) => {
-  const { expanded, toasts, heights, setHeights } = useToaster();
+  const { expanded, toasts, removeToast, heights, setHeights } = useToaster();
 
   const mounted = useMounted();
   const [initialHeight, setInitialHeight] = useState(0);
 
   const ref = useRef<HTMLLIElement>(null);
 
-  const [heightIndex, toastHeightBefore] = useMemo(() => {
+  const [heightIndex, toastHeightBefore, removed] = useMemo(() => {
     let mHeightIndex = 0;
     let toastHeightBefore = 0;
 
     for (const x of heights) {
       if (x.id === data.id) {
-        return [mHeightIndex, toastHeightBefore] as const;
+        return [mHeightIndex, toastHeightBefore, x.removed] as const;
       }
+
+      if (x.removed) continue;
 
       ++mHeightIndex;
       toastHeightBefore += x.height;
     }
 
-    return [0, 0] as const;
+    return [0, 0, false] as const;
   }, [data.id, heights]);
+
+  const deleteToast = () => {
+    setHeights((v) => {
+      const k = v.findIndex((x) => x.id === data.id);
+      v[k].removed = true;
+
+      return [...v];
+    });
+    setTimeout(removeToast, TIMEOUT_BEFORE_REMOVE, data);
+  };
 
   useEffect(() => {
     if (ref.current) {
       const { height } = ref.current.getBoundingClientRect();
       setInitialHeight(height);
-      setHeights((v) => [{ id: data.id, height }, ...v]);
+      setHeights((v) => [{ id: data.id, height, removed: false }, ...v]);
+
+      return () => setHeights((v) => v.filter((x) => x.id !== data.id));
     }
   }, [data.id, setHeights]);
 
@@ -49,12 +64,12 @@ export const Toast = ({ index, data }: ToastProps) => {
       ref={ref}
       className="nano-toast-toast"
       data-mounted={mounted}
-      data-front={index === 0}
-      data-visible={index < VISIBLE_TOAST_COUNT}
+      data-front={heightIndex === 0}
+      data-visible={heightIndex < VISIBLE_TOAST_COUNT}
       data-expanded={expanded}
+      data-removed={removed}
       style={
         {
-          '--index': index,
           '--z-index': toasts.length - index,
           '--height-index': heightIndex,
           '--initial-height': `${initialHeight}px`,
@@ -62,6 +77,22 @@ export const Toast = ({ index, data }: ToastProps) => {
         } as CSSProperties
       }
     >
+      <button className="nano-toast-close-btn" onClick={deleteToast}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
       <div>{data.content}</div>
     </li>
   );
