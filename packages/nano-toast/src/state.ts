@@ -26,6 +26,7 @@ interface Params {
 export const [ToasterProvider, useToaster, ToasterContext] = createContext(
   'ToasterProvider',
   function useToasterContext(params: Params) {
+    const [expanded, setExpanded] = useState(false);
     const [toasts, setToasts] = useState([] as ToastData[]);
     const [heights, setHeights] = useState([] as HeightT[]);
 
@@ -36,6 +37,8 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
 
     return {
       ...params,
+      expanded,
+      setExpanded,
       toasts,
       removeToast,
       heights,

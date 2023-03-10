@@ -18,7 +18,7 @@ export const Toaster = ({
 }: ToasterProps) => (
   <ToasterProvider params={{ gap }}>
     <ToasterContext.Consumer>
-      {({ toasts, heights }) => (
+      {({ toasts, heights, setExpanded }) => (
         <ol
           className="nano-toast"
           style={
@@ -26,9 +26,11 @@ export const Toaster = ({
               '--width': `${width}px`,
               '--offset': `${offset}px`,
               '--gap': `${gap}px`,
-              '--toast-front-height': `${heights[0]?.height ?? 0}px`,
+              '--front-toast-height': `${heights[0]?.height ?? 0}px`,
             } as CSSProperties
           }
+          onMouseEnter={() => setExpanded(true)}
+          onMouseLeave={() => setExpanded(false)}
         >
           {toasts.map((x, index) => (
             <Toast key={x.id} index={index} data={x} />

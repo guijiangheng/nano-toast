@@ -13,7 +13,7 @@ interface ToastProps {
 }
 
 export const Toast = ({ index, data }: ToastProps) => {
-  const { gap, toasts, heights, setHeights } = useToaster();
+  const { expanded, toasts, heights, setHeights } = useToaster();
 
   const mounted = useMounted();
   const [initialHeight, setInitialHeight] = useState(0);
@@ -36,8 +36,6 @@ export const Toast = ({ index, data }: ToastProps) => {
     return [0, 0] as const;
   }, [data.id, heights]);
 
-  const offset = toastHeightBefore + index * gap;
-
   useEffect(() => {
     if (ref.current) {
       const { height } = ref.current.getBoundingClientRect();
@@ -53,13 +51,14 @@ export const Toast = ({ index, data }: ToastProps) => {
       data-mounted={mounted}
       data-front={index === 0}
       data-visible={index < VISIBLE_TOAST_COUNT}
+      data-expanded={expanded}
       style={
         {
           '--index': index,
           '--z-index': toasts.length - index,
           '--height-index': heightIndex,
           '--initial-height': `${initialHeight}px`,
-          '--offset': `${offset}px`,
+          '--toast-height-before': `${toastHeightBefore}px`,
         } as CSSProperties
       }
     >

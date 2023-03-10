@@ -2,6 +2,10 @@
   --y: translateY(100%);
   --border-radius: 6px;
 
+  --offset: var(--height-index) * var(--gap);
+  --expanded-offset: var(--toast-height-before) + var(--gap) *
+    var(--height-index);
+
   position: absolute;
   right: 0;
   bottom: 0;
@@ -29,17 +33,31 @@
 }
 
 .nano-toast-toast[data-mounted='true'] {
-  --y: 0;
+  --y: translateY(0);
   opacity: 1;
 }
 
-.nano-toast-toast[data-mounted='true'][data-front='false'] {
-  --y: translateY(calc(-1 * var(--gap) * var(--height-index)))
-    scale(calc(1 - var(--height-index) * 0.05));
-  height: var(--toast-front-height);
+.nano-toast-toast[data-front='false']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: calc(var(--gap) + 1px);
 }
 
-.nano-toast-toast[data-mounted='true'][data-front='false'] > * {
+.nano-toast-toast[data-front='false'][data-expanded='false'] {
+  --y: translateY(calc(-1 * var(--offset)))
+    scale(calc(1 - var(--height-index) * 0.05));
+  height: var(--front-toast-height);
+}
+
+.nano-toast-toast[data-front='false'][data-expanded='true'] {
+  --y: translateY(calc(-1 * (var(--expanded-offset))));
+  height: var(--initial-height);
+}
+
+.nano-toast-toast[data-front='false'][data-expanded='false'] > * {
   opacity: 0;
 }
 
