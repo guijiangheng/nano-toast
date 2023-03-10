@@ -1,8 +1,15 @@
 import './toast.css';
 
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-import { useMounted } from './hooks';
+import { useMounted, useTimeout } from './hooks';
 import { ToastData, useToaster } from './state';
 
 const VISIBLE_TOAST_COUNT = 3;
@@ -39,15 +46,15 @@ export const Toast = ({ index, data }: ToastProps) => {
     return [0, 0, false] as const;
   }, [data.id, heights]);
 
-  const deleteToast = () => {
+  const deleteToast = useCallback(() => {
     setHeights((v) => {
       const k = v.findIndex((x) => x.id === data.id);
-      v[k].removed = true;
+      v[k] = { ...v[k], removed: true };
 
       return [...v];
     });
     setTimeout(removeToast, TIMEOUT_BEFORE_REMOVE, data);
-  };
+  }, [data, removeToast, setHeights]);
 
   useEffect(() => {
     if (ref.current) {
@@ -58,6 +65,19 @@ export const Toast = ({ index, data }: ToastProps) => {
       return () => setHeights((v) => v.filter((x) => x.id !== data.id));
     }
   }, [data.id, setHeights]);
+
+  const { start, stop } = useTimeout({
+    duration: 4000,
+    onTimeout: deleteToast,
+  });
+
+  useEffect(() => {
+    if (expanded) {
+      stop();
+    } else {
+      start();
+    }
+  }, [expanded, start, stop]);
 
   return (
     <li

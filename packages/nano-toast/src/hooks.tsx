@@ -1,4 +1,10 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 export const useMounted = () => {
   const [mounted, setMounted] = useState(false);
@@ -41,4 +47,35 @@ export const createContext = <T, Params = void>(
   };
 
   return [Provider, useContext, Context] as const;
+};
+
+export interface useTimeoutParams {
+  duration: number;
+  onTimeout: () => void;
+}
+
+export const useTimeout = ({ duration, onTimeout }: useTimeoutParams) => {
+  const remainingTimeRef = useRef(duration);
+  const startTimeRef = useRef<number>();
+  const timeoutIdRef = useRef<number>();
+
+  const start = useCallback(() => {
+    if (remainingTimeRef.current > 0) {
+      startTimeRef.current = Date.now();
+      timeoutIdRef.current = setTimeout(() => {
+        onTimeout();
+        timeoutIdRef.current = undefined;
+      }, remainingTimeRef.current);
+    }
+  }, [onTimeout]);
+
+  const stop = useCallback(() => {
+    if (timeoutIdRef.current) {
+      remainingTimeRef.current -= Date.now() - startTimeRef.current!;
+      clearTimeout(timeoutIdRef.current);
+      timeoutIdRef.current = undefined;
+    }
+  }, []);
+
+  return { start, stop };
 };

@@ -6,18 +6,7 @@ import { toast, Toaster } from 'nano-toast';
 export default function Web() {
   return (
     <div>
-      <button
-        onClick={() =>
-          toast(
-            loremIpsum({
-              sentenceLowerBound: 5,
-              sentenceUpperBound: 60,
-            }),
-          )
-        }
-      >
-        toast
-      </button>
+      <button onClick={() => toast(loremIpsum())}>toast</button>
       <Toaster />
     </div>
   );

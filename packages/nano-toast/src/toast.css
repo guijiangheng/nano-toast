@@ -68,6 +68,11 @@
   opacity: 0;
 }
 
+.nano-toast-toast[data-front='true'][data-removed='true'][data-expanded='false'] {
+  opacity: 0;
+  --y: translateY(100%);
+}
+
 .nano-toast-toast[data-front='false'][data-expanded='false'] > * {
   opacity: 0;
   pointer-events: none;

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState, useMemo } from 'react';
+import { ReactNode, useEffect, useState, useMemo, useCallback } from 'react';
 
 import { createContext } from './hooks';
 import { Subject } from './subject';
@@ -36,8 +36,11 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
       [heights],
     );
 
-    const removeToast = (toast: ToastData) =>
-      setToasts((v) => v.filter((x) => x.id !== toast.id));
+    const removeToast = useCallback(
+      (toast: ToastData) =>
+        setToasts((v) => v.filter((x) => x.id !== toast.id)),
+      [],
+    );
 
     useEffect(() => subject.subscribe((x) => setToasts((v) => [x, ...v])), []);
 
