@@ -2,7 +2,6 @@ import { ReactNode, useEffect, useState } from 'react';
 
 import { createContext } from './hooks';
 import { Subject } from './subject';
-import { ToasterProps } from './toaster';
 
 export type ToastType = 'info' | 'warning' | 'success' | 'error' | 'loading';
 
@@ -20,9 +19,13 @@ interface HeightT {
   height: number;
 }
 
+interface Params {
+  gap: number;
+}
+
 export const [ToasterProvider, useToaster, ToasterContext] = createContext(
   'ToasterProvider',
-  function useToasterContext(params: ToasterProps) {
+  function useToasterContext(params: Params) {
     const [toasts, setToasts] = useState([] as ToastData[]);
     const [heights, setHeights] = useState([] as HeightT[]);
 

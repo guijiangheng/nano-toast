@@ -13,10 +13,10 @@ export interface ToasterProps {
 
 export const Toaster = ({
   offset = 32,
-  gap = 16,
-  width = 300,
+  gap = 14,
+  width = 356,
 }: ToasterProps) => (
-  <ToasterProvider params={{ offset, gap, width }}>
+  <ToasterProvider params={{ gap }}>
     <ToasterContext.Consumer>
       {({ toasts, heights }) => (
         <ol

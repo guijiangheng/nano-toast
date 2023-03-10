@@ -1,0 +1,49 @@
+.nano-toast-toast {
+  --y: translateY(100%);
+  --border-radius: 6px;
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  box-sizing: border-box;
+  width: var(--width);
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: var(--border-radius);
+
+  transform: var(--y);
+
+  z-index: var(--z-index);
+  outline: none;
+  background: #fff;
+  opacity: 0;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+
+  will-change: opacity, transform, height;
+  transition: opacity 400ms, transform 400ms, height 400ms;
+}
+
+.nano-toast-toast > * {
+  transition: opacity 400ms;
+}
+
+.nano-toast-toast[data-mounted='true'] {
+  --y: 0;
+  opacity: 1;
+}
+
+.nano-toast-toast[data-mounted='true'][data-front='false'] {
+  --y: translateY(calc(-1 * var(--gap) * var(--height-index)))
+    scale(calc(1 - var(--height-index) * 0.05));
+  height: var(--toast-front-height);
+}
+
+.nano-toast-toast[data-mounted='true'][data-front='false'] > * {
+  opacity: 0;
+}
+
+.nano-toast-toast[data-visible='false'] {
+  opacity: 0;
+  pointer-events: none;
+}
