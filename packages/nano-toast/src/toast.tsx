@@ -9,9 +9,9 @@ import {
   useState,
 } from 'react';
 
-import { useMounted, useTimeout } from './hooks';
+import { ErrorIcon, getIcon, Loading, SuccessIcon } from './assets';
+import { useMounted, usePromise, useTimeout } from './hooks';
 import { ToastData, useToaster } from './state';
-import { getIcon } from './assets';
 
 const VISIBLE_TOAST_COUNT = 3;
 const TIMEOUT_BEFORE_REMOVE = 400;
@@ -24,6 +24,7 @@ interface ToastProps {
 
 export const Toast = ({ index, data }: ToastProps) => {
   const { expanded, toasts, removeToast, heights, setHeights } = useToaster();
+  const { loading, error, value } = usePromise(data.promise);
 
   const mounted = useMounted();
   const [initialHeight, setInitialHeight] = useState(0);
@@ -58,10 +59,12 @@ export const Toast = ({ index, data }: ToastProps) => {
     setTimeout(removeToast, TIMEOUT_BEFORE_REMOVE, data);
   }, [data, removeToast, setHeights]);
 
-  const icon = useMemo(
-    () => data.icon ?? getIcon(data.type),
-    [data.icon, data.type],
-  );
+  const icon = useMemo(() => {
+    if (data.icon) return data.icon;
+    if (value) return SuccessIcon;
+    if (error) return ErrorIcon;
+    return getIcon(data.type);
+  }, [data.icon, data.type, error, value]);
 
   useEffect(() => {
     if (ref.current) {
@@ -79,12 +82,12 @@ export const Toast = ({ index, data }: ToastProps) => {
   });
 
   useEffect(() => {
-    if (expanded) {
+    if (expanded || loading) {
       stop();
     } else {
       start();
     }
-  }, [expanded, start, stop]);
+  }, [expanded, loading, start, stop]);
 
   return (
     <li
@@ -104,32 +107,42 @@ export const Toast = ({ index, data }: ToastProps) => {
         } as CSSProperties
       }
     >
-      <button className="nano-toast-toast-close-btn" onClick={deleteToast}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <>
+        <button className="nano-toast-toast-close-btn" onClick={deleteToast}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
 
-      {icon && <div className="nano-toast-toast-icon">{icon}</div>}
-      <div className="nano-toast-toast-content">
-        {data.title && (
-          <div className="nano-toast-toast-title">{data.title}</div>
+        {(data.promise || icon) && (
+          <div className="nano-toast-toast-icon">
+            {data.promise && <Loading visible={loading} />}
+            {icon}
+          </div>
         )}
-        {data.description && (
-          <div className="nano-toast-toast-description">{data.description}</div>
-        )}
-      </div>
+
+        <div className="nano-toast-toast-content">
+          {data.title && (
+            <div className="nano-toast-toast-title">{data.title}</div>
+          )}
+          {data.description && (
+            <div className="nano-toast-toast-description">
+              {data.description}
+            </div>
+          )}
+        </div>
+      </>
     </li>
   );
 };

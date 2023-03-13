@@ -73,6 +73,26 @@ export const Types = () => {
               })
             }
           />
+          <Template
+            name="Promise"
+            onClick={() =>
+              toast.promise(
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    if (Math.random() > 0.5) {
+                      resolve('Event has been created');
+                    } else {
+                      reject('Event has been created');
+                    }
+                  }, 4000);
+                }),
+                {
+                  title: 'Event has been created',
+                  description: 'Monday, January 3rd at 6:00pm',
+                },
+              )
+            }
+          />
         </div>
       </div>
     </ActiveTypeProvider>

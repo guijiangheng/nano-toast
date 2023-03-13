@@ -25,14 +25,14 @@
   left: -10%;
   width: 24%;
   height: 8%;
-  background: #eee;
+  background: #333;
   border-radius: 6px;
   animation: nano-toast-spin 1.2s linear infinite;
 }
 
 .nano-toast-loading-spinner:nth-child(1) {
   animation-delay: -1.2s;
-  transform: rotate(0deg) translate(146%);
+  transform: rotate(0.0001deg) translate(146%);
 }
 
 .nano-toast-loading-spinner:nth-child(2) {

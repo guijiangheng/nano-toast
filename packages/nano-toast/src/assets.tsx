@@ -1,7 +1,7 @@
 import './assets.css';
 import { ToastType } from './state';
 
-const spinners = Array(12);
+const spinners = Array(12).fill(0);
 
 export const getIcon = (type: ToastType) => {
   if (type === 'info') return InfoIcon;

@@ -83,3 +83,23 @@ export const useTimeout = ({ duration, onTimeout }: useTimeoutParams) => {
 
   return { start, stop };
 };
+
+export const usePromise = <T,>(p?: Promise<T> | (() => Promise<T>)) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<any>();
+  const [value, setValue] = useState<T>();
+
+  useEffect(() => {
+    if (p) {
+      setLoading(true);
+      setError(undefined);
+      setValue(undefined);
+      (typeof p === 'function' ? p() : p)
+        .then((data) => setValue(data))
+        .catch((error) => setError(error))
+        .finally(() => setLoading(false));
+    }
+  }, [p]);
+
+  return { loading, error, value };
+};

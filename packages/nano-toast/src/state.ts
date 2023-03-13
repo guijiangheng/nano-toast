@@ -3,7 +3,7 @@ import { ReactNode, useEffect, useState, useMemo, useCallback } from 'react';
 import { createContext } from './hooks';
 import { Subject } from './subject';
 
-export type ToastType = 'normal' | 'info' | 'success' | 'error';
+export type ToastType = 'normal' | 'info' | 'success' | 'error' | 'promise';
 
 export type ToastData = {
   id: number;
@@ -12,6 +12,7 @@ export type ToastData = {
   description?: ReactNode;
   icon?: ReactNode;
   duration?: number;
+  promise?: Promise<any> | (() => Promise<any>);
 };
 
 export type ToastOptions = Omit<ToastData, 'id' | 'type'>;
@@ -70,16 +71,30 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
 
 const factory =
   (type: ToastType) =>
-  (title: ReactNode, options: ToastOptions = {}) =>
+  (title: ReactNode, options: ToastOptions = {}) => {
     subject.publish({
       id: id++,
       type,
       title,
       ...options,
     });
+    return { id };
+  };
 
 export const toast = Object.assign(factory('normal'), {
   info: factory('info'),
   success: factory('success'),
   error: factory('error'),
+  promise: <T>(
+    promise: Promise<T> | (() => Promise<T>),
+    options: ToastOptions = {},
+  ) => {
+    subject.publish({
+      id: id++,
+      type: 'promise',
+      promise,
+      ...options,
+    });
+    return { id };
+  },
 });
