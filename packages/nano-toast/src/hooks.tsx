@@ -61,6 +61,10 @@ export const useTimeout = ({ duration, onTimeout }: useTimeoutParams) => {
 
   const start = useCallback(() => {
     if (remainingTimeRef.current > 0) {
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
+
       startTimeRef.current = Date.now();
       timeoutIdRef.current = setTimeout(() => {
         onTimeout();
