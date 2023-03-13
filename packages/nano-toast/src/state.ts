@@ -3,13 +3,18 @@ import { ReactNode, useEffect, useState, useMemo, useCallback } from 'react';
 import { createContext } from './hooks';
 import { Subject } from './subject';
 
-export type ToastType = 'info' | 'warning' | 'success' | 'error' | 'loading';
+export type ToastType = 'normal' | 'info' | 'success' | 'error';
 
-export interface ToastData {
+export type ToastData = {
   id: number;
   type: ToastType;
-  content: ReactNode;
-}
+  title?: ReactNode;
+  description?: ReactNode;
+  icon?: ReactNode;
+  duration?: number;
+};
+
+export type ToastOptions = Omit<ToastData, 'id' | 'type'>;
 
 let id = 0;
 const subject = new Subject<ToastData>();
@@ -26,7 +31,7 @@ interface Params {
 
 export const [ToasterProvider, useToaster, ToasterContext] = createContext(
   'ToasterProvider',
-  function useToasterContext(params: Params) {
+  function useToasterContext(params?: Params) {
     const [expanded, setExpanded] = useState(false);
     const [toasts, setToasts] = useState([] as ToastData[]);
     const [heights, setHeights] = useState([] as HeightT[]);
@@ -63,17 +68,18 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
   },
 );
 
-const factory = (type: ToastType) => (content: ReactNode) =>
-  subject.publish({
-    id: id++,
-    type,
-    content,
-  });
+const factory =
+  (type: ToastType) =>
+  (title: ReactNode, options: ToastOptions = {}) =>
+    subject.publish({
+      id: id++,
+      type,
+      title,
+      ...options,
+    });
 
-export const toast = Object.assign(factory('info'), {
+export const toast = Object.assign(factory('normal'), {
   info: factory('info'),
-  warning: factory('warning'),
   success: factory('success'),
   error: factory('error'),
-  loading: factory('loading'),
 });

@@ -16,9 +16,9 @@ export const useMounted = () => {
 
 const symbol = Symbol();
 
-export const createContext = <T, Params = void>(
+export const createContext = <T, Params>(
   displayName: string,
-  useHook: (params: Params) => T,
+  useHook: (params?: Params) => T,
 ) => {
   const Context = React.createContext<T>(symbol as T);
 
@@ -26,7 +26,7 @@ export const createContext = <T, Params = void>(
     params,
     children,
   }: {
-    params: Params;
+    params?: Params;
     children: ReactElement;
   }) => {
     const value = useHook(params);

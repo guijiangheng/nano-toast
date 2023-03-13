@@ -11,9 +11,11 @@ import {
 
 import { useMounted, useTimeout } from './hooks';
 import { ToastData, useToaster } from './state';
+import { getIcon } from './assets';
 
 const VISIBLE_TOAST_COUNT = 3;
 const TIMEOUT_BEFORE_REMOVE = 400;
+const DEFAULT_TIMEOUT_DURATION = 4000;
 
 interface ToastProps {
   index: number;
@@ -56,6 +58,11 @@ export const Toast = ({ index, data }: ToastProps) => {
     setTimeout(removeToast, TIMEOUT_BEFORE_REMOVE, data);
   }, [data, removeToast, setHeights]);
 
+  const icon = useMemo(
+    () => data.icon ?? getIcon(data.type),
+    [data.icon, data.type],
+  );
+
   useEffect(() => {
     if (ref.current) {
       const { height } = ref.current.getBoundingClientRect();
@@ -67,7 +74,7 @@ export const Toast = ({ index, data }: ToastProps) => {
   }, [data.id, setHeights]);
 
   const { start, stop } = useTimeout({
-    duration: 4000,
+    duration: data.duration ?? DEFAULT_TIMEOUT_DURATION,
     onTimeout: deleteToast,
   });
 
@@ -97,7 +104,7 @@ export const Toast = ({ index, data }: ToastProps) => {
         } as CSSProperties
       }
     >
-      <button className="nano-toast-close-btn" onClick={deleteToast}>
+      <button className="nano-toast-toast-close-btn" onClick={deleteToast}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="12"
@@ -113,7 +120,16 @@ export const Toast = ({ index, data }: ToastProps) => {
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
-      <div>{data.content}</div>
+
+      {icon && <div className="nano-toast-toast-icon">{icon}</div>}
+      <div className="nano-toast-toast-content">
+        {data.title && (
+          <div className="nano-toast-toast-title">{data.title}</div>
+        )}
+        {data.description && (
+          <div className="nano-toast-toast-description">{data.description}</div>
+        )}
+      </div>
     </li>
   );
 };

@@ -11,6 +11,10 @@
   right: 0;
   bottom: 0;
 
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
   box-sizing: border-box;
   width: var(--width);
   padding: 16px;
@@ -83,7 +87,7 @@
   pointer-events: none;
 }
 
-.nano-toast-close-btn {
+.nano-toast-toast-close-btn {
   position: absolute;
   left: 0;
   top: 0;
@@ -106,6 +110,22 @@
   transition: opacity 100ms;
 }
 
-.nano-toast-toast:hover .nano-toast-close-btn {
+.nano-toast-toast:hover .nano-toast-toast-close-btn {
   opacity: 1;
+}
+
+.nano-toast-toast-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.nano-toast-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nano-toast-toast-title {
+  font-weight: 500;
 }

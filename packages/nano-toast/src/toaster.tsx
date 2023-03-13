@@ -5,6 +5,10 @@ import { CSSProperties } from 'react';
 import { ToasterContext, ToasterProvider } from './state';
 import { Toast } from './toast';
 
+const DEFAULT_OFFSET = 32;
+const DEFAULT_GAP = 14;
+const DEFAULT_WIDTH = 356;
+
 export interface ToasterProps {
   offset?: number;
   gap?: number;
@@ -12,9 +16,9 @@ export interface ToasterProps {
 }
 
 export const Toaster = ({
-  offset = 32,
-  gap = 14,
-  width = 356,
+  offset = DEFAULT_OFFSET,
+  gap = DEFAULT_GAP,
+  width = DEFAULT_WIDTH,
 }: ToasterProps) => (
   <ToasterProvider params={{ gap }}>
     <ToasterContext.Consumer>
