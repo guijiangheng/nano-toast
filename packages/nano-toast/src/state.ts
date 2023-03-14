@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useState, useMemo, useCallback } from 'react';
+import { ReactNode, useEffect, useState, useMemo } from 'react';
 
-import { createContext } from './hooks';
+import { createContext, useEventCallback } from './hooks';
 import { Subject } from './subject';
 
 const TIMEOUT_BEFORE_REMOVE = 400;
@@ -51,31 +51,26 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
       [heights],
     );
 
-    const updateToast = useCallback(
-      (data: ToastData) => {
-        const k = toasts.findIndex((x) => data.id === x.id);
-        if (k !== -1) {
-          toasts[k] = { ...toasts[k], ...data, type: toasts[k].type };
-          setToasts([...toasts]);
-        }
-      },
-      [toasts],
-    );
+    const updateToast = useEventCallback((data: ToastData) => {
+      const k = toasts.findIndex((x) => x.id === data.id);
+      if (k !== -1) {
+        toasts[k] = { ...toasts[k], ...data, type: toasts[k].type };
+        setToasts([...toasts]);
+      }
+    });
 
-    const deleteToast = useCallback(
-      (id: number) => {
-        const k = heights.findIndex((x) => x.id === id);
-        if (k !== -1) {
-          heights[k] = { ...heights[k], removed: true };
-          setHeights([...heights]);
-          setTimeout(
-            () => setToasts((v) => v.filter((x) => x.id !== id)),
-            TIMEOUT_BEFORE_REMOVE,
-          );
-        }
-      },
-      [heights],
-    );
+    const deleteToast = useEventCallback((id: number) => {
+      setTimeout(
+        () => setToasts((v) => v.filter((x) => x.id !== id)),
+        TIMEOUT_BEFORE_REMOVE,
+      );
+
+      const k = heights.findIndex((x) => x.id === id);
+      if (k !== -1) {
+        heights[k] = { ...heights[k], removed: true };
+        setHeights([...heights]);
+      }
+    });
 
     useEffect(() => {
       if (!toasts.length) {

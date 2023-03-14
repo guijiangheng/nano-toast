@@ -14,6 +14,19 @@ export const useMounted = () => {
   return mounted;
 };
 
+export const useEventCallback = <T extends (...args: any[]) => any>(fn: T) => {
+  const ref = useRef(fn);
+
+  useEffect(() => {
+    ref.current = fn;
+  });
+
+  return useCallback(
+    (...args: Parameters<T>): ReturnType<T> => ref.current(...args),
+    [],
+  );
+};
+
 const symbol = Symbol();
 
 export const createContext = <T, Params>(
@@ -59,20 +72,6 @@ export const useTimeout = ({ duration, onTimeout }: useTimeoutParams) => {
   const startTimeRef = useRef<number>();
   const timeoutIdRef = useRef<number>();
 
-  const start = useCallback(() => {
-    if (remainingTimeRef.current > 0) {
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
-      }
-
-      startTimeRef.current = Date.now();
-      timeoutIdRef.current = setTimeout(() => {
-        onTimeout();
-        timeoutIdRef.current = undefined;
-      }, remainingTimeRef.current);
-    }
-  }, [onTimeout]);
-
   const stop = useCallback(() => {
     if (timeoutIdRef.current) {
       remainingTimeRef.current -= Date.now() - startTimeRef.current!;
@@ -80,6 +79,20 @@ export const useTimeout = ({ duration, onTimeout }: useTimeoutParams) => {
       timeoutIdRef.current = undefined;
     }
   }, []);
+
+  const start = useCallback(() => {
+    if (remainingTimeRef.current > 0) {
+      startTimeRef.current = Date.now();
+      timeoutIdRef.current = setTimeout(() => {
+        onTimeout();
+        timeoutIdRef.current = undefined;
+      }, remainingTimeRef.current);
+
+      return stop;
+    } else {
+      onTimeout();
+    }
+  }, [onTimeout, stop]);
 
   return { start, stop };
 };

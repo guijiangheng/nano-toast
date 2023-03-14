@@ -79,7 +79,7 @@ export const Toast = ({ index, data }: ToastProps) => {
     if (expanded || loading) {
       stop();
     } else {
-      start();
+      return start();
     }
   }, [expanded, loading, start, stop]);
 
