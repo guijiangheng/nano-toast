@@ -75,23 +75,26 @@ export const Types = () => {
           />
           <Template
             name="Promise"
-            onClick={() =>
-              toast.promise(
-                new Promise((resolve, reject) => {
-                  setTimeout(() => {
-                    if (Math.random() > 0.5) {
-                      resolve('Event has been created');
-                    } else {
-                      reject('Event has been created');
-                    }
-                  }, 4000);
-                }),
-                {
-                  title: 'Event has been created',
-                  description: 'Monday, January 3rd at 6:00pm',
-                },
-              )
-            }
+            onClick={() => {
+              const promise = new Promise<string>((resolve, reject) => {
+                setTimeout(() => {
+                  if (Math.random() > 0.5) {
+                    resolve('Operate success');
+                  } else {
+                    reject('Operate failed');
+                  }
+                }, 4000);
+              });
+
+              const { update } = toast.promise(promise, {
+                title: 'Event has been created',
+                description: 'Monday, January 3rd at 6:00pm',
+              });
+
+              promise
+                .then((x) => update({ title: x }))
+                .catch((x) => update({ title: x }));
+            }}
           />
         </div>
       </div>

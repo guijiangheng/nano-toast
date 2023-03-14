@@ -14,7 +14,6 @@ import { useMounted, usePromise, useTimeout } from './hooks';
 import { ToastData, useToaster } from './state';
 
 const VISIBLE_TOAST_COUNT = 3;
-const TIMEOUT_BEFORE_REMOVE = 400;
 const DEFAULT_TIMEOUT_DURATION = 4000;
 
 interface ToastProps {
@@ -23,7 +22,7 @@ interface ToastProps {
 }
 
 export const Toast = ({ index, data }: ToastProps) => {
-  const { expanded, toasts, removeToast, heights, setHeights } = useToaster();
+  const { expanded, toasts, deleteToast, heights, setHeights } = useToaster();
   const { loading, error, value } = usePromise(data.promise);
 
   const mounted = useMounted();
@@ -49,15 +48,10 @@ export const Toast = ({ index, data }: ToastProps) => {
     return [0, 0, false] as const;
   }, [data.id, heights]);
 
-  const deleteToast = useCallback(() => {
-    setHeights((v) => {
-      const k = v.findIndex((x) => x.id === data.id);
-      v[k] = { ...v[k], removed: true };
-
-      return [...v];
-    });
-    setTimeout(removeToast, TIMEOUT_BEFORE_REMOVE, data);
-  }, [data, removeToast, setHeights]);
+  const mDeleteToast = useCallback(
+    () => deleteToast(data.id),
+    [data.id, deleteToast],
+  );
 
   const icon = useMemo(() => {
     if (data.icon) return data.icon;
@@ -78,7 +72,7 @@ export const Toast = ({ index, data }: ToastProps) => {
 
   const { start, stop } = useTimeout({
     duration: data.duration ?? DEFAULT_TIMEOUT_DURATION,
-    onTimeout: deleteToast,
+    onTimeout: mDeleteToast,
   });
 
   useEffect(() => {
@@ -108,7 +102,7 @@ export const Toast = ({ index, data }: ToastProps) => {
       }
     >
       <>
-        <button className="nano-toast-toast-close-btn" onClick={deleteToast}>
+        <button className="nano-toast-toast-close-btn" onClick={mDeleteToast}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="12"

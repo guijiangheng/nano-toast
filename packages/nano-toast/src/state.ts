@@ -3,9 +3,18 @@ import { ReactNode, useEffect, useState, useMemo, useCallback } from 'react';
 import { createContext } from './hooks';
 import { Subject } from './subject';
 
-export type ToastType = 'normal' | 'info' | 'success' | 'error' | 'promise';
+const TIMEOUT_BEFORE_REMOVE = 400;
 
-export type ToastData = {
+export type ToastType =
+  | 'normal'
+  | 'info'
+  | 'success'
+  | 'error'
+  | 'promise'
+  | 'update'
+  | 'dismiss';
+
+export interface ToastData {
   id: number;
   type: ToastType;
   title?: ReactNode;
@@ -13,7 +22,7 @@ export type ToastData = {
   icon?: ReactNode;
   duration?: number;
   promise?: Promise<any> | (() => Promise<any>);
-};
+}
 
 export type ToastOptions = Omit<ToastData, 'id' | 'type'>;
 
@@ -42,13 +51,31 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
       [heights],
     );
 
-    const removeToast = useCallback(
-      (toast: ToastData) =>
-        setToasts((v) => v.filter((x) => x.id !== toast.id)),
-      [],
+    const updateToast = useCallback(
+      (data: ToastData) => {
+        const k = toasts.findIndex((x) => data.id === x.id);
+        if (k !== -1) {
+          toasts[k] = { ...toasts[k], ...data, type: toasts[k].type };
+          setToasts([...toasts]);
+        }
+      },
+      [toasts],
     );
 
-    useEffect(() => subject.subscribe((x) => setToasts((v) => [x, ...v])), []);
+    const deleteToast = useCallback(
+      (id: number) => {
+        const k = heights.findIndex((x) => x.id === id);
+        if (k !== -1) {
+          heights[k] = { ...heights[k], removed: true };
+          setHeights([...heights]);
+          setTimeout(
+            () => setToasts((v) => v.filter((x) => x.id !== id)),
+            TIMEOUT_BEFORE_REMOVE,
+          );
+        }
+      },
+      [heights],
+    );
 
     useEffect(() => {
       if (!toasts.length) {
@@ -56,12 +83,26 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
       }
     }, [toasts.length]);
 
+    useEffect(
+      () =>
+        subject.subscribe((x) => {
+          if (x.type === 'dismiss') {
+            deleteToast(x.id);
+          } else if (x.type === 'update') {
+            updateToast(x);
+          } else {
+            setToasts((v) => [x, ...v]);
+          }
+        }),
+      [deleteToast, updateToast],
+    );
+
     return {
       ...params,
       expanded,
       setExpanded,
       toasts,
-      removeToast,
+      deleteToast,
       heights,
       setHeights,
       frontToastHeight,
@@ -69,17 +110,38 @@ export const [ToasterProvider, useToaster, ToasterContext] = createContext(
   },
 );
 
+export const dismiss = (id: number) =>
+  subject.publish({
+    id,
+    type: 'dismiss',
+  });
+
+export const update = (id: number, options: ToastOptions) =>
+  subject.publish({
+    id,
+    type: 'update',
+    ...options,
+  });
+
+const publish = (data: Omit<ToastData, 'id'>) => {
+  const mId = id++;
+
+  subject.publish({
+    id: mId,
+    ...data,
+  });
+
+  return {
+    id: mId,
+    dismiss: () => dismiss(mId),
+    update: (options: ToastOptions) => update(mId, options),
+  };
+};
+
 const factory =
   (type: ToastType) =>
-  (title: ReactNode, options: ToastOptions = {}) => {
-    subject.publish({
-      id: id++,
-      type,
-      title,
-      ...options,
-    });
-    return { id };
-  };
+  (title: ReactNode, options: ToastOptions = {}) =>
+    publish({ type, title, ...options });
 
 export const toast = Object.assign(factory('normal'), {
   info: factory('info'),
@@ -88,13 +150,5 @@ export const toast = Object.assign(factory('normal'), {
   promise: <T>(
     promise: Promise<T> | (() => Promise<T>),
     options: ToastOptions = {},
-  ) => {
-    subject.publish({
-      id: id++,
-      type: 'promise',
-      promise,
-      ...options,
-    });
-    return { id };
-  },
+  ) => publish({ type: 'promise', promise, ...options }),
 });
