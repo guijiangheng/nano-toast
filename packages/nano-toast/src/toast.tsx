@@ -1,3 +1,5 @@
+import "./toast.css";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ToastData } from "./api";
@@ -6,7 +8,7 @@ import { useMounted, usePromise, useTimeout } from "./hooks";
 
 const GAP = 14;
 const TIME_BEFORE_UNMOUNT = 200;
-const DEFAULT_TIMEOUT_DURATION = 4000;
+const DEFAULT_TIMEOUT_DURATION = 400000;
 
 export interface ToastProps {
   toast: ToastData;
@@ -14,7 +16,7 @@ export interface ToastProps {
 }
 
 export const Toast = ({ toast, index }: ToastProps) => {
-  const { expanded, heights, removeHeight, removeToast } = useToaster();
+  const { toasts, expanded, heights, removeHeight, removeToast } = useToaster();
 
   const mounted = useMounted();
   const [removed, setRemoved] = useState(false);
@@ -73,6 +75,11 @@ export const Toast = ({ toast, index }: ToastProps) => {
       data-mounted={mounted}
       data-removed={removed}
       data-expanded={expanded}
+      data-styled={true}
+      data-type={error ? "error" : value ? "success" : toast.type}
+      style={{
+        zIndex: toasts.length - index,
+      }}
     >
       <button disabled={loading} onClick={deleteToast}>
         x
