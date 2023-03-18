@@ -33,28 +33,29 @@ export const ToasterImpl = ({
   offset = OFFSET,
 }: ToasterProps) => {
   const { toasts, heights, setExpanded } = useToaster();
+
   const [y, x] = position.split("-");
 
   return (
     <ul
       className="nano-toast"
       data-theme={theme}
-      data-rich-colors={richColors}
       data-y-position={y}
       data-x-position={x}
+      data-rich-colors={richColors}
       style={
         {
           "--width": `${width}px`,
           "--gap": `${GAP}px`,
           "--offset": `${offset}px`,
-          "--front-toast-height": `${heights[0] ?? 0}px`,
+          "--front-toast-height": `${heights[0]?.height ?? 0}px`,
         } as CSSProperties
       }
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
       {toasts.map((x, index) => (
-        <Toast key={x.id} index={index} toast={x}></Toast>
+        <Toast key={x.id} index={index} position={position} toast={x}></Toast>
       ))}
     </ul>
   );

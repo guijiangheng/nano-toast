@@ -44,7 +44,7 @@ export const [ToasterProvider, useToaster] = createContext(
         if (x.type === "update") {
           updateToast(x);
         } else {
-          setToasts((v) => [...v, x]);
+          setToasts((v) => [x, ...v]);
         }
       });
     }, [updateToast]);

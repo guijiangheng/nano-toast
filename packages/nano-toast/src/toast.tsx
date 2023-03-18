@@ -1,22 +1,36 @@
 import "./toast.css";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { ToastData } from "./api";
 import { useToaster } from "./context";
 import { useMounted, usePromise, useTimeout } from "./hooks";
+import { Position } from "./toaster";
+import { ErrorIcon, getIcon, Spinner, SuccessIcon } from "./assets";
 
 const GAP = 14;
 const TIME_BEFORE_UNMOUNT = 200;
-const DEFAULT_TIMEOUT_DURATION = 400000;
+const DEFAULT_TIMEOUT_DURATION = 4000;
+const VISIBLE_TOASTS_AMOUNT = 3;
 
 export interface ToastProps {
   toast: ToastData;
   index: number;
+  position: Position;
 }
 
-export const Toast = ({ toast, index }: ToastProps) => {
-  const { toasts, expanded, heights, removeHeight, removeToast } = useToaster();
+export const Toast = ({ index, position, toast }: ToastProps) => {
+  const { toasts, expanded, heights, setHeights, removeHeight, removeToast } =
+    useToaster();
+
+  const ref = useRef<HTMLLIElement>(null);
 
   const mounted = useMounted();
   const [removed, setRemoved] = useState(false);
@@ -24,7 +38,7 @@ export const Toast = ({ toast, index }: ToastProps) => {
   const [initialHeight, setInitialHeight] = useState(0);
   const [offsetBeforeRemove, setOffsetBeforeRemove] = useState(0);
 
-  const ref = useRef<HTMLLIElement>(null);
+  const [y, x] = position.split("-");
 
   const [heightIndex, toastHeightBefore] = useMemo(() => {
     let mToastHeightBefore = 0;
@@ -41,6 +55,9 @@ export const Toast = ({ toast, index }: ToastProps) => {
     ? heightIndex * GAP + toastHeightBefore
     : heightIndex * GAP;
 
+  const icon =
+    toast.icon ?? value ? SuccessIcon : error ? ErrorIcon : getIcon(toast.type);
+
   const deleteToast = useCallback(() => {
     setRemoved(true);
     setOffsetBeforeRemove(offset);
@@ -53,6 +70,16 @@ export const Toast = ({ toast, index }: ToastProps) => {
     duration: toast.duration ?? DEFAULT_TIMEOUT_DURATION,
     onTimeout: deleteToast,
   });
+
+  useEffect(() => {
+    if (ref.current) {
+      const { height } = ref.current.getBoundingClientRect();
+      setInitialHeight(height);
+      setHeights((v) => [{ id: toast.id, height }, ...v]);
+
+      return () => setHeights((v) => v.filter((x) => x.id !== toast.id));
+    }
+  }, [setHeights, toast.id]);
 
   useEffect(() => {
     if (expanded || loading) {
@@ -72,18 +99,53 @@ export const Toast = ({ toast, index }: ToastProps) => {
     <li
       ref={ref}
       className="nano-toast-toast"
+      data-y-position={y}
+      data-x-position={x}
       data-mounted={mounted}
       data-removed={removed}
       data-expanded={expanded}
+      data-front={index === 0}
+      data-visible={index < VISIBLE_TOASTS_AMOUNT}
+      data-promise={Boolean(toast.promise)}
       data-styled={true}
       data-type={error ? "error" : value ? "success" : toast.type}
-      style={{
-        zIndex: toasts.length - index,
-      }}
+      style={
+        {
+          zIndex: toasts.length - index,
+          "--index": index,
+          "--initial-height": `${initialHeight}px`,
+          "--offset": `${removed ? offsetBeforeRemove : offset}px`,
+        } as CSSProperties
+      }
     >
-      <button disabled={loading} onClick={deleteToast}>
-        x
+      <button
+        className="nano-toast-toast-close-btn"
+        disabled={loading}
+        onClick={deleteToast}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
       </button>
+
+      {(loading || icon) && (
+        <div className="nano-toast-toast-icon">
+          {toast.promise && <Spinner visible={loading} />}
+          {icon}
+        </div>
+      )}
+
       <div className="nano-toast-toast-content">
         {toast.title && (
           <div className="nano-toast-toast-title">{toast.title}</div>

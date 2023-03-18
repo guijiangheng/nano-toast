@@ -73,3 +73,110 @@
   --y: translateY(0);
   opacity: 1;
 }
+
+.nano-toast-toast[data-expanded="false"][data-front="false"] {
+  --scale: 1 - var(--index) * 0.05;
+  --y: translateY(calc(var(--lift-amount) * var(--index)))
+    scale(calc(var(--scale)));
+  height: var(--front-toast-height);
+}
+
+.nano-toast-toast > * {
+  transition: opacity 400ms;
+}
+
+.nano-toast-toast[data-expanded="false"][data-front="false"][data-styled="true"]
+  > * {
+  opacity: 0;
+}
+
+.nano-toast-toast[data-visible="false"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nano-toast-toast[data-mounted="true"][data-expanded="true"] {
+  --y: translateY(calc(var(--lift) * var(--offset)));
+  height: var(--initial-height);
+}
+
+.nano-toast-toast[data-removed="true"][data-front="true"] {
+  --y: translateY(calc(var(--lift) * -100%));
+  opacity: 0;
+}
+
+.nano-toast-toast[data-removed="true"][data-front="false"][data-expanded="true"] {
+  --y: translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));
+  opacity: 0;
+}
+
+.nano-toast-toast[data-removed="true"][data-front="false"][data-expanded="false"] {
+  opacity: 0;
+}
+
+.nano-toast-toast:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  height: calc(var(--gap) + 1px);
+  bottom: 100%;
+  width: 100%;
+}
+
+.nano-toast-toast-close-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+
+  background: var(--gray1);
+  color: var(--gray12);
+  border: 1px solid var(--gray4);
+  transform: translate(-35%, -35%);
+  border-radius: 50%;
+  opacity: 0;
+  cursor: pointer;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 100ms, background 200ms, border-color 200ms;
+}
+
+.nano-toast-toast:hover .nano-toast-toast-close-btn {
+  opacity: 1;
+  pointer-events: initial;
+}
+
+.nano-toast-toast:hover .nano-toast-toast-close-btn:hover {
+  background: var(--gray2);
+  border-color: var(--gray5);
+}
+
+.nano-toast-toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  flex-shrink: 0;
+
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.nano-toast-toast[data-promise="true"] .nano-toast-toast-icon > svg {
+  opacity: 0;
+  transform: scale(0.8);
+  transform-origin: center;
+  animation: nano-toast-fade-in 300ms ease forwards;
+}
+
+.nano-toast-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
