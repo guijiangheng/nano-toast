@@ -1,14 +1,14 @@
 import { toast } from "nano-toast";
-import { createContext } from "nano-toast/src/hooks";
 import { useState } from "react";
+import { createContext } from "../hooks";
 
-const [ActiveTypeProvider, useActiveType] = createContext(
-  "ActiveTypeProvider",
-  function useActiveTypeImpl() {
-    const [activeType, setActiveType] = useState<string>("");
-    return { activeType, setActiveType };
-  }
-);
+function useActiveTypeImpl() {
+  const [activeType, setActiveType] = useState<string>("");
+  return { activeType, setActiveType };
+}
+
+const [ActiveTypeProvider, useActiveType] =
+  createContext<ReturnType<typeof useActiveTypeImpl>>("ActiveTypeProvider");
 
 interface Props {
   name: string;
@@ -32,8 +32,10 @@ const Template = ({ name, onClick }: Props) => {
 };
 
 export const Types = () => {
+  const ctx = useActiveTypeImpl();
+
   return (
-    <ActiveTypeProvider>
+    <ActiveTypeProvider value={ctx}>
       <div>
         <h2>Types</h2>
         <p>

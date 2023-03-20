@@ -1,5 +1,5 @@
 import React, {
-  ReactElement,
+  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -16,23 +16,12 @@ export const useMounted = () => {
 
 const symbol = Symbol();
 
-export const createContext = <T, Params>(
-  displayName: string,
-  useHook: (params?: Params) => T
-) => {
+export const createContext = <T,>(displayName: string) => {
   const Context = React.createContext<T>(symbol as T);
 
-  const Provider = ({
-    params,
-    children,
-  }: {
-    params?: Params;
-    children: ReactElement;
-  }) => {
-    const value = useHook(params);
-
-    return <Context.Provider value={value}>{children}</Context.Provider>;
-  };
+  const Provider = ({ value, children }: { children: ReactNode; value: T }) => (
+    <Context.Provider value={value}>{children}</Context.Provider>
+  );
 
   Provider.displayName = displayName;
 

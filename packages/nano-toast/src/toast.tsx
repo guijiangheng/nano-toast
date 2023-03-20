@@ -10,10 +10,9 @@ import {
 } from "react";
 
 import { ToastData } from "./api";
-import { useToaster } from "./context";
-import { useMounted, usePromise, useTimeout } from "./hooks";
-import { Position } from "./toaster";
 import { ErrorIcon, getIcon, Spinner, SuccessIcon } from "./assets";
+import { useMounted, usePromise, useTimeout } from "./hooks";
+import { useToaster } from "./toaster";
 
 const GAP = 14;
 const TIME_BEFORE_UNMOUNT = 200;
@@ -23,12 +22,19 @@ const VISIBLE_TOASTS_AMOUNT = 3;
 export interface ToastProps {
   toast: ToastData;
   index: number;
-  position: Position;
 }
 
-export const Toast = ({ index, position, toast }: ToastProps) => {
-  const { toasts, expanded, heights, setHeights, removeHeight, removeToast } =
-    useToaster();
+export const Toast = ({ index, toast }: ToastProps) => {
+  const {
+    x,
+    y,
+    toasts,
+    expanded,
+    heights,
+    setHeights,
+    removeHeight,
+    removeToast,
+  } = useToaster();
 
   const ref = useRef<HTMLLIElement>(null);
 
@@ -37,8 +43,6 @@ export const Toast = ({ index, position, toast }: ToastProps) => {
   const { loading, error, value } = usePromise(toast.promise);
   const [initialHeight, setInitialHeight] = useState(0);
   const [offsetBeforeRemove, setOffsetBeforeRemove] = useState(0);
-
-  const [y, x] = position.split("-");
 
   const [heightIndex, toastHeightBefore] = useMemo(() => {
     let mToastHeightBefore = 0;
