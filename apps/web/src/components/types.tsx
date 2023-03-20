@@ -1,106 +1,117 @@
 import { toast } from "nano-toast";
 import { useState } from "react";
+import { CodeBlock } from "./code-block";
 
-import { createContext } from "../hooks";
+const types = [
+  {
+    name: "Default",
+    action: () => toast("Event has been created"),
+    snippet: `toast('Event has been created')`,
+  },
+  {
+    name: "Description",
+    action: () =>
+      toast("Event has been created", {
+        description: "Monday, January 3rd at 6:00pm",
+      }),
+    snippet: `toast("Event has been created", {
+  description: "Monday, January 3rd at 6:00pm",
+})`,
+  },
+  {
+    name: "Info",
+    action: () => toast.info("Event has been created"),
+    snippet: `toast.info("Event has been created")`,
+  },
+  {
+    name: "Success",
+    action: () =>
+      toast.success("Event has been created", {
+        description: "Monday, January 3rd at 6:00pm",
+      }),
+    snippet: `toast.success("Event has been created", {
+  description: "Monday, January 3rd at 6:00pm",
+})`,
+  },
+  {
+    name: "Error",
+    action: () =>
+      toast.error("Event has been created", {
+        description: "Monday, January 3rd at 6:00pm",
+      }),
+    snippet: `toast.error("Event has been created", {
+  description: "Monday, January 3rd at 6:00pm",
+})`,
+  },
+  {
+    name: "Promise",
+    action: () => {
+      const promise = new Promise<string>((resolve, reject) => {
+        setTimeout(() => {
+          if (Math.random() > 0.5) {
+            resolve("Create event success");
+          } else {
+            reject("Create event failed");
+          }
+        }, 4000);
+      });
 
-function useActiveTypeImpl() {
-  const [activeType, setActiveType] = useState<string>("");
-  return { activeType, setActiveType };
-}
+      const { update } = toast.promise(promise, {
+        title: "Creating event...",
+        description: "Monday, January 3rd at 6:00pm",
+      });
 
-const [ActiveTypeProvider, useActiveType] =
-  createContext<ReturnType<typeof useActiveTypeImpl>>("ActiveTypeProvider");
+      promise
+        .then((x) => update({ title: x }))
+        .catch((x) => update({ title: x }));
+    },
+    snippet: `const promise = new Promise<string>((resolve, reject) => {
+  setTimeout(() => {
+    if (Math.random() > 0.5) {
+      resolve("Create event success");
+    } else {
+      reject("Create event failed");
+    }
+  }, 4000);
+});
 
-interface Props {
-  name: string;
-  onClick: () => void;
-}
+const { update } = toast.promise(promise, {
+  title: "Creating event...",
+  description: "Monday, January 3rd at 6:00pm",
+});
 
-const Template = ({ name, onClick }: Props) => {
-  const { activeType, setActiveType } = useActiveType();
-
-  return (
-    <button
-      data-active={activeType === name}
-      onClick={() => {
-        setActiveType(name);
-        onClick();
-      }}
-    >
-      {name}
-    </button>
-  );
-};
+promise
+  .then((x) => update({ title: x }))
+  .catch((x) => update({ title: x }));`,
+  },
+];
 
 export const Types = () => {
-  const ctx = useActiveTypeImpl();
+  const [activeType, setActiveType] = useState(types[0]);
 
   return (
-    <ActiveTypeProvider value={ctx}>
-      <div>
-        <h2>Types</h2>
-        <p>
-          You can customize the type of toast you want to render, and pass an
-          options object as the second argument.
-        </p>
-        <div className="buttons">
-          <Template
-            name="Default"
-            onClick={() => toast("Event has been created")}
-          />
-          <Template
-            name="Description"
-            onClick={() =>
-              toast("Event has been created", {
-                description: "Monday, January 3rd at 6:00pm",
-              })
-            }
-          />
-          <Template
-            name="Info"
-            onClick={() => toast.info("Event has been created")}
-          />
-          <Template
-            name="Success"
-            onClick={() =>
-              toast.success("Event has been created", {
-                description: "Monday, January 3rd at 6:00pm",
-              })
-            }
-          />
-          <Template
-            name="Error"
-            onClick={() =>
-              toast.error("Event has been created", {
-                description: "Monday, January 3rd at 6:00pm",
-              })
-            }
-          />
-          <Template
-            name="Promise"
+    <div>
+      <h2>Types</h2>
+      <p>
+        You can customize the type of toast you want to render, and pass an
+        options object as the second argument.
+      </p>
+      <div className="buttons">
+        {types.map((type) => (
+          <button
+            key={type.name}
+            className="button"
+            data-active={activeType === type}
             onClick={() => {
-              const promise = new Promise<string>((resolve, reject) => {
-                setTimeout(() => {
-                  if (Math.random() > 0.5) {
-                    resolve("Create event success");
-                  } else {
-                    reject("Create event failed");
-                  }
-                }, 4000);
-              });
-
-              const { update } = toast.promise(promise, {
-                title: "Creating event...",
-                description: "Monday, January 3rd at 6:00pm",
-              });
-
-              promise
-                .then((x) => update({ title: x }))
-                .catch((x) => update({ title: x }));
+              setActiveType(type);
+              type.action();
             }}
-          />
-        </div>
+          >
+            {type.name}
+          </button>
+        ))}
       </div>
-    </ActiveTypeProvider>
+      <CodeBlock>{activeType.snippet}</CodeBlock>
+    </div>
   );
 };

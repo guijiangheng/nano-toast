@@ -1,7 +1,7 @@
 import { useToaster } from "@app/page";
 
 export const ExpandMode = () => {
-  const { setExpandByDefault } = useToaster();
+  const { expandByDefault, setExpandByDefault } = useToaster();
 
   return (
     <div>
@@ -13,6 +13,7 @@ export const ExpandMode = () => {
       <div className="buttons">
         <button
           className="button"
+          data-active={expandByDefault}
           onClick={() => setExpandByDefault((x) => !x)}
         >
           Toggle expand by default

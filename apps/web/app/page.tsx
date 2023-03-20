@@ -4,9 +4,12 @@ import { Position, Toaster } from "nano-toast";
 import { useState } from "react";
 
 import { ExpandMode } from "@components/expand-mode";
+import { Footer } from "@components/footer";
+import { Hero } from "@components/hero";
 import { Positions } from "@components/positions";
 import { RichColors } from "@components/rich-colors";
 import { Types } from "@components/types";
+
 import { createContext } from "../src/hooks";
 
 const useToasterImpl = () => {
@@ -32,10 +35,16 @@ export default function Home() {
 
   return (
     <ToasterProvider value={ctx}>
-      <Types />
-      <Positions />
-      <ExpandMode />
-      <RichColors />
+      <main className="container">
+        <Hero />
+        <div className="content">
+          <Types />
+          <Positions />
+          <ExpandMode />
+          <RichColors />
+        </div>
+      </main>
+      <Footer />
       <Toaster
         position={ctx.position}
         richColors={ctx.richColors}
