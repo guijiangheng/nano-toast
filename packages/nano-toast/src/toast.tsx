@@ -17,7 +17,6 @@ import { useToaster } from "./toaster";
 const GAP = 14;
 const TIME_BEFORE_UNMOUNT = 200;
 const DEFAULT_TIMEOUT_DURATION = 4000;
-const VISIBLE_TOASTS_AMOUNT = 3;
 
 export interface ToastProps {
   toast: ToastData;
@@ -28,8 +27,10 @@ export const Toast = ({ index, toast }: ToastProps) => {
   const {
     x,
     y,
+    visibleToast,
     toasts,
     expanded,
+    expandByDefault,
     heights,
     setHeights,
     removeHeight,
@@ -55,9 +56,10 @@ export const Toast = ({ index, toast }: ToastProps) => {
     return [0, 0] as const;
   }, [heights, toast.id]);
 
-  const offset = expanded
-    ? heightIndex * GAP + toastHeightBefore
-    : heightIndex * GAP;
+  const offset =
+    expanded || expandByDefault
+      ? heightIndex * GAP + toastHeightBefore
+      : heightIndex * GAP;
 
   const icon =
     toast.icon ?? value ? SuccessIcon : error ? ErrorIcon : getIcon(toast.type);
@@ -107,9 +109,9 @@ export const Toast = ({ index, toast }: ToastProps) => {
       data-x-position={x}
       data-mounted={mounted}
       data-removed={removed}
-      data-expanded={expanded}
+      data-expanded={Boolean(expanded || (mounted && expandByDefault))}
       data-front={index === 0}
-      data-visible={index < VISIBLE_TOASTS_AMOUNT}
+      data-visible={index < visibleToast}
       data-promise={Boolean(toast.promise)}
       data-styled={true}
       data-type={error ? "error" : value ? "success" : toast.type}
@@ -117,7 +119,7 @@ export const Toast = ({ index, toast }: ToastProps) => {
         {
           zIndex: toasts.length - index,
           "--index": index,
-          "--initial-height": `${initialHeight}px`,
+          "--initial-height": expandByDefault ? "auto" : `${initialHeight}px`,
           "--offset": `${removed ? offsetBeforeRemove : offset}px`,
         } as CSSProperties
       }

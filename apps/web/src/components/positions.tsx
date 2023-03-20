@@ -1,6 +1,4 @@
-import { toast } from "nano-toast";
-
-import { useToaster } from "../../app/page";
+import { useToaster } from "@app/page";
 
 const positions = [
   "top-left",
@@ -23,15 +21,7 @@ export const Positions = () => {
           <button
             data-active={position === x}
             className="button"
-            onClick={() => {
-              const toastsAmount =
-                document.querySelectorAll(".nano-toast-toast").length;
-              setPosition(x);
-              if (toastsAmount > 0 && x !== position) return;
-              toast("Event has been created", {
-                description: "Monday, January 3rd at 6:00pm",
-              });
-            }}
+            onClick={() => setPosition(x)}
             key={x}
           >
             {x}

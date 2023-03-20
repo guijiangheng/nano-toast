@@ -9,6 +9,7 @@ import { Toast } from "./toast";
 const TOAST_WIDTH = 356;
 const GAP = 14;
 const OFFSET = 32;
+const VISIBLE_TOASTS_AMOUNT = 3;
 
 interface HeightT {
   id: number;
@@ -66,9 +67,10 @@ function useToasterImpl() {
 }
 
 interface ExtraContextParams {
-  expand?: boolean;
   x: string;
   y: string;
+  expandByDefault?: boolean;
+  visibleToast: number;
 }
 
 export const [ToasterProvider, useToaster] = createContext<
@@ -87,7 +89,8 @@ export interface ToasterProps {
   theme?: "light" | "dark";
   position?: Position;
   richColors?: boolean;
-  expand?: boolean;
+  expandByDefault?: boolean;
+  visibleToast?: number;
   width?: number;
   offset?: number;
 }
@@ -96,15 +99,16 @@ export const Toaster = ({
   theme = "light",
   position = "bottom-right",
   richColors,
+  expandByDefault,
   width = TOAST_WIDTH,
   offset = OFFSET,
-  expand,
+  visibleToast = VISIBLE_TOASTS_AMOUNT,
 }: ToasterProps) => {
   const ctx = useToasterImpl();
   const [y, x] = position.split("-");
 
   return (
-    <ToasterProvider value={{ ...ctx, x, y, expand }}>
+    <ToasterProvider value={{ ...ctx, x, y, expandByDefault, visibleToast }}>
       <ul
         className="nano-toast"
         data-theme={theme}

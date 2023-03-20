@@ -1,5 +1,6 @@
 import { toast } from "nano-toast";
 import { useState } from "react";
+
 import { createContext } from "../hooks";
 
 function useActiveTypeImpl() {
