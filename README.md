@@ -1,6 +1,6 @@
 # Introduction
 
-[Nano Toast](https://sonner.emilkowal.ski/) is an opinionated toast component for React. It's customizable, but styled by default.
+[Nano Toast](https://nano-toast-web.vercel.app/) is an opinionated toast component for React. It's a simplified version of [Sonner](https://sonner.emilkowal.ski/) just for learning purpose, recommend using `sonner` instead if you want to use in production.
 
 ## Usage
 

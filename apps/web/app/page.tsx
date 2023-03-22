@@ -5,6 +5,7 @@ import { Toaster } from "nano-toast";
 import { ExpandMode } from "@components/expand-mode";
 import { Footer } from "@components/footer";
 import { Hero } from "@components/hero";
+import { Installation } from "@components/installation";
 import { Positions } from "@components/positions";
 import { RichColors } from "@components/rich-colors";
 import { Types } from "@components/types";
@@ -19,6 +20,7 @@ export default function Home() {
       <main className="container">
         <Hero />
         <div className="content">
+          <Installation />
           <Types />
           <Positions />
           <ExpandMode />
