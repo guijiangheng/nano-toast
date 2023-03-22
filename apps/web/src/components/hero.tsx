@@ -18,7 +18,7 @@ export const Hero = () => {
         <button
           data-primary=""
           onClick={() => {
-            toast("Sonner", {
+            toast("Nano Toast", {
               description: "An opinionated toast component for React.",
             });
           }}

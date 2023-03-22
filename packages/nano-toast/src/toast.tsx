@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-import { ToastData } from "./api";
+import { ToastData, update } from "./api";
 import { ErrorIcon, getIcon, Spinner, SuccessIcon } from "./assets";
 import { useMounted, usePromise, useTimeout } from "./hooks";
 import { useToaster } from "./toaster";
@@ -72,6 +72,8 @@ export const Toast = ({ index, toast }: ToastProps) => {
     setTimeout(removeToast, TIME_BEFORE_UNMOUNT, toast.id);
   }, [offset, removeHeight, removeToast, toast.id]);
 
+  const updateToast = useMemo(() => update.bind(null, toast.id), [toast.id]);
+
   const { start, stop } = useTimeout({
     duration: toast.duration ?? DEFAULT_TIMEOUT_DURATION,
     onTimeout: deleteToast,
@@ -113,7 +115,7 @@ export const Toast = ({ index, toast }: ToastProps) => {
       data-front={index === 0}
       data-visible={index < visibleToast}
       data-promise={Boolean(toast.promise)}
-      data-styled={true}
+      data-styled={!toast.jsx}
       data-type={error ? "error" : value ? "success" : toast.type}
       style={
         {
@@ -124,44 +126,58 @@ export const Toast = ({ index, toast }: ToastProps) => {
         } as CSSProperties
       }
     >
-      <button
-        className="nano-toast-toast-close-btn"
-        disabled={loading}
-        onClick={deleteToast}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {!toast.jsx && (
+        <button
+          className="nano-toast-toast-close-btn"
+          disabled={loading}
+          onClick={deleteToast}
         >
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-
-      {(loading || icon) && (
-        <div className="nano-toast-toast-icon">
-          {toast.promise && <Spinner visible={loading} />}
-          {icon}
-        </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       )}
 
-      <div className="nano-toast-toast-content">
-        {toast.title && (
-          <div className="nano-toast-toast-title">{toast.title}</div>
-        )}
-        {toast.description && (
-          <div className="nano-toast-toast-description">
-            {toast.description}
+      {toast.jsx ? (
+        toast.jsx({
+          loading,
+          value,
+          error,
+          dismiss: deleteToast,
+          update: updateToast,
+        })
+      ) : (
+        <>
+          {(loading || icon) && (
+            <div className="nano-toast-toast-icon">
+              {toast.promise && <Spinner visible={loading} />}
+              {icon}
+            </div>
+          )}
+
+          <div className="nano-toast-toast-content">
+            {toast.title && (
+              <div className="nano-toast-toast-title">{toast.title}</div>
+            )}
+            {toast.description && (
+              <div className="nano-toast-toast-description">
+                {toast.description}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </li>
   );
 };

@@ -10,18 +10,27 @@ export type ToastType =
   | "promise"
   | "update";
 
-export interface ToastData {
+interface JsxParams<T = any> {
+  loading: boolean;
+  error?: any;
+  value?: T;
+  update: (options: ToastOptions<T>) => void;
+  dismiss: () => void;
+}
+
+export interface ToastData<T = any> {
   id: number;
   type: ToastType;
   title?: ReactNode;
   description?: ReactNode;
   icon?: ReactNode;
+  jsx?: (params: JsxParams<T>) => ReactNode;
   duration?: number;
-  promise?: Promise<any> | (() => Promise<any>);
+  promise?: Promise<T> | (() => Promise<T>);
   removed?: boolean;
 }
 
-export type ToastOptions = Omit<ToastData, "id" | "type">;
+export type ToastOptions<T = any> = Omit<ToastData<T>, "id" | "type">;
 
 let id = 0;
 export const subject = new Subject<ToastData>();
@@ -66,6 +75,6 @@ export const toast = Object.assign(factory("normal"), {
   error: factory("error"),
   promise: <T>(
     promise: Promise<T> | (() => Promise<T>),
-    options: ToastOptions = {}
+    options: ToastOptions<T>
   ) => publish({ type: "promise", promise, ...options }),
 });
