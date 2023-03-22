@@ -98,7 +98,7 @@ toast(<div>A custom toast with default styling</div>);
 
 ### Headless
 
-You can use `toast.custom` to render an unstyled toast with custom jsx while maintaining the functionality.
+You can pass `jsx` to render an unstyled toast with custom jsx while maintaining the functionality.
 
 ```tsx
 const promise = new Promise<string>((resolve, reject) => {
@@ -175,7 +175,7 @@ Offset from the edges of the screen.
 
 ### Programmatically remove toast
 
-To remove a toast programmatically use `toast.dismiss(id)`.
+To remove a toast programmatically use `dismiss`.
 
 ```jsx
 const { dismiss } = toast("Event has been created");
