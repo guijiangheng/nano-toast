@@ -14,9 +14,7 @@ import { ErrorIcon, getIcon, Spinner, SuccessIcon } from "./assets";
 import { useMounted, usePromise, useTimeout } from "./hooks";
 import { useToaster } from "./toaster";
 
-const GAP = 14;
 const TIME_BEFORE_UNMOUNT = 200;
-const DEFAULT_TIMEOUT_DURATION = 4000;
 
 export interface ToastProps {
   toast: ToastData;
@@ -27,6 +25,8 @@ export const Toast = ({ index, toast }: ToastProps) => {
   const {
     x,
     y,
+    gap,
+    duration,
     visibleToast,
     toasts,
     expanded,
@@ -58,8 +58,8 @@ export const Toast = ({ index, toast }: ToastProps) => {
 
   const offset =
     expanded || expandByDefault
-      ? heightIndex * GAP + toastHeightBefore
-      : heightIndex * GAP;
+      ? heightIndex * gap + toastHeightBefore
+      : heightIndex * gap;
 
   const icon =
     toast.icon ?? value ? SuccessIcon : error ? ErrorIcon : getIcon(toast.type);
@@ -75,7 +75,7 @@ export const Toast = ({ index, toast }: ToastProps) => {
   const updateToast = useMemo(() => update.bind(null, toast.id), [toast.id]);
 
   const { start, stop } = useTimeout({
-    duration: toast.duration ?? DEFAULT_TIMEOUT_DURATION,
+    duration: toast.duration ?? duration,
     onTimeout: deleteToast,
   });
 

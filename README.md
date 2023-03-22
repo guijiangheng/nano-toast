@@ -183,7 +183,7 @@ const { dismiss } = toast("Event has been created");
 dismiss();
 ```
 
-### Programmatically remove toast
+### Duration
 
 You can change the duration of each toast by using the `duration` property, or change the duration of all toasts like this:
 

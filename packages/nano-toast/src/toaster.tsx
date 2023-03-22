@@ -10,6 +10,7 @@ const TOAST_WIDTH = 356;
 const GAP = 14;
 const OFFSET = 32;
 const VISIBLE_TOASTS_AMOUNT = 3;
+const DEFAULT_TIMEOUT_DURATION = 4000;
 
 interface HeightT {
   id: number;
@@ -71,6 +72,8 @@ interface ExtraContextParams {
   y: string;
   expandByDefault?: boolean;
   visibleToast: number;
+  gap: number;
+  duration: number;
 }
 
 export const [ToasterProvider, useToaster] = createContext<
@@ -91,8 +94,10 @@ export interface ToasterProps {
   richColors?: boolean;
   expandByDefault?: boolean;
   visibleToast?: number;
+  gap?: number;
   width?: number;
   offset?: number;
+  duration?: number;
 }
 
 export const Toaster = ({
@@ -100,15 +105,19 @@ export const Toaster = ({
   position = "bottom-right",
   richColors,
   expandByDefault,
+  gap = GAP,
   width = TOAST_WIDTH,
   offset = OFFSET,
+  duration = DEFAULT_TIMEOUT_DURATION,
   visibleToast = VISIBLE_TOASTS_AMOUNT,
 }: ToasterProps) => {
   const ctx = useToasterImpl();
   const [y, x] = position.split("-");
 
   return (
-    <ToasterProvider value={{ ...ctx, x, y, expandByDefault, visibleToast }}>
+    <ToasterProvider
+      value={{ ...ctx, x, y, expandByDefault, visibleToast, gap, duration }}
+    >
       <ul
         className="nano-toast"
         data-theme={theme}
