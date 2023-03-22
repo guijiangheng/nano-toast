@@ -1,11 +1,17 @@
 {
   "name": "nano-toast",
   "version": "0.0.0",
-  "main": "./src//index.ts",
-  "types": "./src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "scripts": {
-    "lint": "eslint *.ts*"
+    "lint": "eslint *.ts*",
+    "build": "tsup src/index.ts",
+    "dev": "tsup src/index.ts --watch"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
@@ -14,6 +20,7 @@
     "eslint-config-custom": "workspace:*",
     "react": "^18.2.0",
     "tsconfig": "workspace:*",
+    "tsup": "^6.7.0",
     "typescript": "^4.5.2"
   }
 }
