@@ -28,7 +28,7 @@ export const Hero = () => {
         </button>
         <a
           className={styles.button}
-          href="https://github.com/emilkowalski/sonner"
+          href="https://github.com/guijiangheng/nano-toast"
           target="_blank"
           rel="noreferrer"
         >

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import emil from "public/emil.jpeg";
+import gjh from "public/gjh.jpeg";
 
 import styles from "./footer.module.css";
 
@@ -10,18 +10,18 @@ export const Footer = () => {
         <p className={styles.p}>
           <Image
             alt="Emil's profile picture"
-            src={emil}
+            src={gjh}
             height={24}
             width={24}
           />
           <span>
             Made by{" "}
             <a
-              href="https://twitter.com/emilkowalski_"
+              href="https://twitter.com/guijiangheng"
               target="_blank"
               rel="noreferrer"
             >
-              Emil.
+              GJH.
             </a>
           </span>
         </p>

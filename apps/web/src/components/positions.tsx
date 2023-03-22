@@ -1,4 +1,4 @@
-import { useToaster } from "@app/page";
+import { useToaster } from "../hooks";
 
 const positions = [
   "top-left",

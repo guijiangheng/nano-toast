@@ -1,73 +1,198 @@
-# Turborepo starter
+# Introduction
 
-This is an official pnpm starter turborepo.
+[Nano Toast](https://sonner.emilkowal.ski/) is an opinionated toast component for React. It's customizable, but styled by default.
 
-## What's inside?
+## Usage
 
-This turborepo uses [pnpm](https://pnpm.io) as a package manager. It includes the following packages/apps:
+To start using the library, install it in your project:
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm run build
+```bash
+npm install nano-toast
 ```
 
-### Develop
+Add `<Toaster />` to your app, it will be the place where all your toasts will be rendered.
+After that you can use `toast()` from anywhere in your app.
 
-To develop all apps and packages, run the following command:
+```jsx
+import { Toaster, toast } from "nano-toast";
 
-```
-cd my-turborepo
-pnpm run dev
-```
+// ...
 
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-pnpm dlx turbo login
+function App() {
+  return (
+    <div>
+      <Toaster />
+      <button onClick={() => toast("My first toast")}>Give me a toast</button>
+    </div>
+  );
+}
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Types
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
+### Default
 
+Most basic toast. You can customize it (and any other type) by passing an options object as the second argument.
+
+```jsx
+toast("Event has been created");
 ```
-pnpm dlx turbo link
+
+With custom icon and description:
+
+```jsx
+toast("Event has been created", {
+  description: "Monday, January 3rd at 6:00pm",
+  icon: <MyIcon />,
+});
 ```
 
-## Useful Links
+### Success
 
-Learn more about the power of Turborepo:
+Renders a checkmark icon in front of the message.
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+```jsx
+toast.success("Event has been created");
+```
+
+### Error
+
+Renders an error icon in front of the message.
+
+```jsx
+toast.error("Event has not been created");
+```
+
+### Promise
+
+Starts in a loading state and will update automatically after the promise resolves or fails.
+
+```ts
+const promise = new Promise()<string>((resolve, reject) => {
+  setTimeout(() => {
+    if (Math.random() > 0.5) {
+      resolve("Create event success");
+    } else {
+      reject("Create event failed");
+    }
+  }, 4000);
+});
+
+const { update } = toast.promise(promise, {
+  title: "Creating event...",
+  description: "Monday, January 3rd at 6:00pm",
+});
+
+promise.then((x) => update({ title: x })).catch((x) => update({ title: x }));
+```
+
+### Custom JSX
+
+You can pass jsx as the first argument instead of a string to render custom jsx while maintaining default styling. You can use the headless version below for a custom, unstyled toast.
+
+```jsx
+toast(<div>A custom toast with default styling</div>);
+```
+
+## Customization
+
+### Headless
+
+You can use `toast.custom` to render an unstyled toast with custom jsx while maintaining the functionality.
+
+```tsx
+const promise = new Promise<string>((resolve, reject) => {
+  setTimeout(() => {
+    if (Math.random() > 0.5) {
+      resolve("Create event success");
+    } else {
+      reject("Create event failed");
+    }
+  }, 4000);
+});
+
+toast.promise(promise, {
+  jsx: ({ value, error, dismiss }) => (
+    <div className={styles.headless}>
+      <p className={styles.headlessTitle}>
+        {value ? value : error ? error : "Creating Event..."}
+      </p>
+      <p className={styles.headlessDescription}>
+        Today at 4:00pm - Louvre Museum
+      </p>
+      <button className={styles.headlessClose} onClick={dismiss}>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2.96967 2.96967C3.26256 2.67678 3.73744 2.67678 4.03033 2.96967L8 6.939L11.9697 2.96967C12.2626 2.67678 12.7374 2.67678 13.0303 2.96967C13.3232 3.26256 13.3232 3.73744 13.0303 4.03033L9.061 8L13.0303 11.9697C13.2966 12.2359 13.3208 12.6526 13.1029 12.9462L13.0303 13.0303C12.7374 13.3232 12.2626 13.3232 11.9697 13.0303L8 9.061L4.03033 13.0303C3.73744 13.3232 3.26256 13.3232 2.96967 13.0303C2.67678 12.7374 2.67678 12.2626 2.96967 11.9697L6.939 8L2.96967 4.03033C2.7034 3.76406 2.6792 3.3474 2.89705 3.05379L2.96967 2.96967Z"></path>
+        </svg>
+      </button>
+    </div>
+  ),
+});
+```
+
+### Theme
+
+You can change the theme using the `theme` prop. Default theme is light.
+
+```jsx
+<Toaster theme="dark" />
+```
+
+### Position
+
+You can change the position through the `position` prop on the `<Toaster />` component. Default is `bottom-right`.
+
+```jsx
+// Available positions
+// top-left, top-center, top-right, bottom-left, bottom-center, bottom-right
+
+<Toaster position="top-center" />
+```
+
+### Expanded
+
+Toasts can also be expanded by default through the `expand` prop. You can also change the amount of visible toasts which is 3 by default.
+
+```jsx
+<Toaster expandByDefault visibleToasts={9} />
+```
+
+### Rich colors
+
+You can make error and success state more colorful by adding the `richColors` prop.
+
+```jsx
+<Toaster richColors />
+```
+
+### Custom offset
+
+Offset from the edges of the screen.
+
+```jsx
+<Toaster offset="80px" />
+```
+
+### Programmatically remove toast
+
+To remove a toast programmatically use `toast.dismiss(id)`.
+
+```jsx
+const { dismiss } = toast("Event has been created");
+
+dismiss();
+```
+
+### Programmatically remove toast
+
+You can change the duration of each toast by using the `duration` property, or change the duration of all toasts like this:
+
+```jsx
+<Toaster duration={10000} />
+```
+
+```jsx
+toast("Event has been created", {
+  duration: 10000,
+});
+```

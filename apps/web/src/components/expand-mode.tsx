@@ -1,4 +1,4 @@
-import { useToaster } from "@app/page";
+import { useToaster } from "../hooks";
 
 export const ExpandMode = () => {
   const { expandByDefault, setExpandByDefault } = useToaster();

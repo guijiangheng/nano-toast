@@ -112,6 +112,8 @@
 
 .nano-toast-toast[data-removed="true"][data-front="false"][data-expanded="false"] {
   opacity: 0;
+  --y: translateY(40%);
+  transition: transform 500ms, opacity 200ms;
 }
 
 .nano-toast-toast:after {
@@ -144,6 +146,10 @@
   pointer-events: none;
   z-index: 1;
   transition: opacity 100ms, background 200ms, border-color 200ms;
+}
+
+.nano-toast-toast-close-btn[disabled] {
+  cursor: not-allowed;
 }
 
 .nano-toast-toast:hover .nano-toast-toast-close-btn {

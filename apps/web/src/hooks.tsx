@@ -1,4 +1,5 @@
-import React, { ReactNode } from "react";
+import { Position } from "nano-toast";
+import React, { ReactNode, useState } from "react";
 
 const symbol = Symbol();
 
@@ -23,3 +24,21 @@ export const createContext = <T,>(displayName: string) => {
 
   return [Provider, useContext, Context] as const;
 };
+
+export const useToasterImpl = () => {
+  const [position, setPosition] = useState<Position>("bottom-right");
+  const [richColors, setRichColors] = useState(false);
+  const [expandByDefault, setExpandByDefault] = useState(false);
+
+  return {
+    position,
+    setPosition,
+    expandByDefault,
+    setExpandByDefault,
+    richColors,
+    setRichColors,
+  };
+};
+
+export const [ToasterProvider, useToaster] =
+  createContext<ReturnType<typeof useToasterImpl>>("ToasterProvider");
